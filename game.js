@@ -12,14 +12,26 @@ $(document).keypress(function () {
     }
 });
 
+$("#image").click(function(){
+    if(!started){
+        $("#level-title").text("Level"+level);
+        nextSequence();
+        started=true;
+        animatePress("image");
+    }
+})
+
 $(".btn").click(function () {
     var userChosenColour = $(this).attr("id");
     userClickedPattern.push(userChosenColour);
     playSound(userChosenColour);
     animatePress(userChosenColour);
+    checkAnswer(userClickedPattern.length - 1);
 });
 
 function nextSequence() {
+    userClickedPattern = [];
+
     level++;
     $("#level-title").text("Level " + level);
 
@@ -46,3 +58,28 @@ function playSound(name) {
     audio.play();
 }
 
+function checkAnswer(currentLevel) {
+    if (gamePattern[currentLevel] === userClickedPattern[currentLevel]) {
+        console.log("success");
+        if (userClickedPattern.length === gamePattern.length) {
+            setTimeout(function () {
+                nextSequence();
+            }, 1000);
+        }
+    } else {
+        console.log("wrong");
+        playSound("wrong");
+        $("#level-title").text("Game Over, Press any key to Restart");
+        $("body").addClass("game-over");
+        setTimeout(function(){
+            $("body").removeClass("game-over");
+        },200);
+        startOver();
+    }
+}
+
+function startOver() {
+    level=0;
+    gamePattern=[];
+    started=false;
+}
